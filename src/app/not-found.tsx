@@ -18,7 +18,7 @@ const NotFoundPage = async () => {
     <main>
       <Fonts />
 
-      <SiteHeaderSessionProvider data={session} />
+      {/* <SiteHeaderSessionProvider data={session} /> */}
 
       <div
         className={

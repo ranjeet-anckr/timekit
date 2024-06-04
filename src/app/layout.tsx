@@ -26,7 +26,7 @@ export default function RootLayout({
 function getClassName() {
   const themeCookie = cookies().get('theme')?.value;
   const theme = themeCookie ?? configuration.theme;
-  const dark = theme === 'dark';
+  const dark = theme === 'light';
 
   return classNames({
     dark,
@@ -49,7 +49,7 @@ export const metadata = {
     creator: configuration.site.twitterHandle,
   },
   icons: {
-    icon: '/assets/images/favicon/favicon.ico',
+    icon: '/assets/images/favicon/favicon.svg',
     shortcut: '/shortcut-icon.png',
     apple: '/assets/images/favicon/apple-touch-icon.png',
     other: {

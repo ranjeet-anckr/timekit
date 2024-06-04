@@ -19,7 +19,7 @@ const Head = () => {
     <>
       <title>{configuration.site.name}</title>
 
-      <link rel="shortcut icon" href="/assets/images/favicon/favicon.ico" />
+      <link rel="shortcut icon" href="/assets/images/favicon/favicon.svg" />
 
       <link
         rel="apple-touch-icon"
