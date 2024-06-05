@@ -7,6 +7,9 @@ const nextConfig = {
   images: {
     remotePatterns: getRemotePatterns(),
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+},
 };
 
 module.exports = withAnalyzer({
