@@ -10,6 +10,7 @@ import {
 } from '~/core/ui/accordion';
 import { ChevronRight } from 'lucide-react';
 import { data } from './data';
+import AdBanner from 'components/AdBanner';
 
 const WordGame = () => {
   const [userInput, setUserInput] = useState('');
@@ -102,7 +103,7 @@ const WordGame = () => {
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-3">
-          <AccordionTrigger className="text-medium text-base md:text-xl text-left ">
+          <AccordionTrigger className="text-medium text-base md:text-xl text-left justify-start ">
             Show Words
           </AccordionTrigger>
           <AccordionContent className="text-base md:text-lg">
@@ -155,6 +156,17 @@ const WordGame = () => {
         <span className="mr-2">Coming Soon</span>
         <ChevronRight />
       </Button>
+      <div>
+        <div className="bg-black mb-5">
+          <AdBanner
+            dataAdFormat="auto"
+            dataFullWidthResponsive={true}
+            dataAdSlot="4730621222"
+          />
+        </div>
+
+       
+      </div>
     </div>
   );
 };

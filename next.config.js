@@ -1,5 +1,4 @@
 const withAnalyzer = require('@next/bundle-analyzer');
-const { withContentlayer } = require('next-contentlayer');
 
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
@@ -12,7 +11,7 @@ const nextConfig = {
 
 module.exports = withAnalyzer({
   enabled: process.env.ANALYZE === 'true',
-})(withContentlayer(nextConfig));
+})(nextConfig);
 
 function getRemotePatterns() {
   // add here the remote patterns for your images

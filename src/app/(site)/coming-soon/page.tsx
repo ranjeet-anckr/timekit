@@ -6,7 +6,7 @@ import { ChevronLeft } from 'lucide-react';
 
 const ComingSoon = () => {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col overflow-auto">
       <Container>
         <div className="relative w-full h-screen">
           <Button
@@ -18,10 +18,11 @@ const ComingSoon = () => {
             <span className="ml-2">Back to HomePage</span>
           </Button>
           <Image
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full "
             layout="fill"
-            src="/assets/images/Wordoken_Coming Soon Page.svg"
+            src="/assets/images/coming-soon.png"
             alt="App Image"
+            placeholder="empty"
           />
         </div>
       </Container>

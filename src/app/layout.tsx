@@ -7,6 +7,7 @@ import ThemeSetter from '~/components/ThemeSetter';
 import Fonts from '~/components/Fonts';
 
 import configuration from '~/configuration';
+import AdSense from 'components/AdSense';
 
 export default function RootLayout({
   children,
@@ -15,6 +16,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang={configuration.site.locale} className={getClassName()}>
+      <head>
+        <AdSense pId={'pub-6617299272110261'} />
+      </head>
       <Fonts />
       <ThemeSetter />
 

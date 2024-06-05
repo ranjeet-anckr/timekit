@@ -13,7 +13,7 @@ export const metadata = {
 const ErrorPage = () => {
   return (
     <main>
-      <SiteHeader />
+      {/* <SiteHeader /> */}
 
       <div
         className={
