@@ -87,6 +87,7 @@ const WordGame = () => {
           <TextField.Input
             required
             type="text"
+            className="uppercase font-bold text-lg"
             placeholder="Enter a word"
             maxLength={8}
             {...wordControl}
