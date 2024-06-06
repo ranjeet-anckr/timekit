@@ -9,3 +9,4 @@
 export const USERS_TABLE = `users`;
 export const SUBSCRIPTIONS_TABLE = `subscriptions`;
 export const CUSTOMERS_SUBSCRIPTIONS_TABLE = `customers_subscriptions`;
+export const  DICTIONARY=`dictionary`
