@@ -17,3 +17,4 @@ const AdSense = ({ pId }: AdsenseTypes) => {
 }
 
 export default AdSense
+

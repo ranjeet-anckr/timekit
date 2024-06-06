@@ -11,7 +11,7 @@ const Hint: React.FC<React.PropsWithChildren> = ({ children }) => {
   return (
     <span
       className={`block pl-1 text-xs
-        font-normal leading-tight text-gray-500 dark:text-gray-400`}
+        font-normal leading-tight text-gray-500 dark:text-gray-400 mt-1`}
     >
       {children}
     </span>

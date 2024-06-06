@@ -1,4 +1,4 @@
-"use client"
+'use client';
 import React, { useEffect, useState, ReactNode } from 'react';
 import TextField from '../../../core/ui/TextField';
 import Button from '../../../core/ui/Button';
@@ -11,6 +11,7 @@ import {
 import { ChevronRight } from 'lucide-react';
 import { data } from './data';
 import AdBanner from 'components/AdBanner';
+import { useForm } from 'react-hook-form';
 
 type WordList = string[];
 
@@ -26,10 +27,29 @@ interface AdBannerProps {
 }
 
 const WordGame = () => {
-  const [userInput, setUserInput] = useState<string>('');
   const [message, setMessage] = useState<string>('');
-  const [wordDokenList, setWordDokenList] = useState<string[]>(data[0].abcdefil.wordokenList);
+  const [wordDokenList, setWordDokenList] = useState<string[]>(
+    data[0].abcdefil.wordokenList,
+  );
   const [words, setWords] = useState<Words>({ rareWord: [], commonWord: [] });
+  const { register, handleSubmit, formState } = useForm({
+    defaultValues: {
+      word: '',
+    },
+  });
+  const errors = formState.errors;
+  const wordControl = register('word', {
+    required: 'This field is required',
+    minLength: {
+      value: 6,
+      message: 'Word must be at least 6 characters',
+    },
+    maxLength: {
+      value: 8,
+      message: 'Word must be no more than 8 characters',
+    },
+  });
+  
 
   useEffect(() => {
     const rareWords: string[] = [];
@@ -46,12 +66,9 @@ const WordGame = () => {
     setWords({ rareWord: rareWords, commonWord: commonWords });
   }, []);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUserInput(event.target.value.toUpperCase());
-  };
-
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
+  const onSubmit = (data: { word: string }) => {
+    console.log('word', data);
+    // Handle form submission with data.word
   };
 
   return (
@@ -61,32 +78,44 @@ const WordGame = () => {
           Wordoken
         </span>
       </HeroTitle>
-      <form onSubmit={handleSubmit} className="mt-10 flex flex-row align-center justify-center space-x-3 md:space-x-8">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="mt-10 flex flex-row align-center justify-center space-x-3 md:space-x-8"
+        noValidate
+      >
         <TextField>
           <TextField.Input
             required
             type="text"
             placeholder="Enter a word"
-            minLength={10}
-            maxLength={10}
-            onChange={handleChange}
-            value={userInput}
+            maxLength={8}
+            {...wordControl}
           />
+          <TextField.Hint>Text should be a minimum of 6 characters and a maximum of 8 characters. </TextField.Hint>
+          <TextField.Error error={errors.word?.message} />
         </TextField>
-        <Button variant="default" type="submit" className="font-bold text-lg">
+
+        <Button variant="default" type="submit" className="font-bold text-lg" disabled={Object.keys(errors).length > 0}>
           Submit
         </Button>
       </form>
-      {message && <div className="text-center mt-4">{message}</div>}
       <Accordion type="single" collapsible className="w-full mt-10">
         <AccordionItems words={words} wordDokenList={wordDokenList} />
       </Accordion>
-      <Button variant="link" href="/coming-soon" className="bg-white font-bold text-lg">
+      <Button
+        variant="link"
+        href="/coming-soon"
+        className="bg-white font-bold text-lg"
+      >
         <span className="mr-2">Coming Soon</span>
         <ChevronRight />
       </Button>
       <div className="bg-black mb-5">
-        <AdBanner dataAdFormat="auto" dataFullWidthResponsive={true} dataAdSlot="4730621222" />
+        <AdBanner
+          dataAdFormat="auto"
+          dataFullWidthResponsive={true}
+          dataAdSlot="4730621222"
+        />
       </div>
     </div>
   );
@@ -115,13 +144,17 @@ function AccordionItems({ words, wordDokenList }: AccordionItemsProps) {
   return (
     <>
       <AccordionItem value="item-1" className="border-b">
-        <AccordionTrigger className="text-medium text-base md:text-xl text-left">Show Wordoken Hint</AccordionTrigger>
+        <AccordionTrigger className="text-medium text-base md:text-xl text-left">
+          Show Wordoken Hint
+        </AccordionTrigger>
         <AccordionContent className="text-base md:text-lg">
           Critical assessment of a process or activity or of their result.
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-2" className="border-b">
-        <AccordionTrigger className="text-medium text-base md:text-xl text-left">Show Wordoken</AccordionTrigger>
+        <AccordionTrigger className="text-medium text-base md:text-xl text-left">
+          Show Wordoken
+        </AccordionTrigger>
         <AccordionContent className="text-base md:text-lg">
           <div className="text-center flex flex-row flex-wrap space-x-2 md:space-x-4">
             {wordDokenList.map((item, index) => (
@@ -133,12 +166,16 @@ function AccordionItems({ words, wordDokenList }: AccordionItemsProps) {
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-3">
-        <AccordionTrigger className="text-medium text-base md:text-xl text-left justify-start">Show Words</AccordionTrigger>
+        <AccordionTrigger className="text-medium text-base md:text-xl text-left justify-start">
+          Show Words
+        </AccordionTrigger>
         <AccordionContent className="text-base md:text-lg">
           <div className="pl-4">
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="item-1" className="border-b">
-                <AccordionTrigger className="text-medium text-base md:text-xl text-left">Show Rare Words</AccordionTrigger>
+                <AccordionTrigger className="text-medium text-base md:text-xl text-left">
+                  Show Rare Words
+                </AccordionTrigger>
                 <AccordionContent className="text-base md:text-lg">
                   <div className="text-center flex flex-row flex-wrap space-x-2 md:space-x-4">
                     {words.rareWord.map((item, index) => (
@@ -150,7 +187,9 @@ function AccordionItems({ words, wordDokenList }: AccordionItemsProps) {
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="item-2" className="border-b">
-                <AccordionTrigger className="text-medium text-base md:text-xl text-left">Show Common Words</AccordionTrigger>
+                <AccordionTrigger className="text-medium text-base md:text-xl text-left">
+                  Show Common Words
+                </AccordionTrigger>
                 <AccordionContent className="text-base md:text-lg">
                   <div className="text-center flex flex-row flex-wrap space-x-2 md:space-x-4">
                     {words.commonWord.map((item, index) => (
