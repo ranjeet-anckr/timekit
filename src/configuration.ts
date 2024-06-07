@@ -11,7 +11,7 @@ enum Themes {
 const configuration = {
   site: {
     name: 'Wordoken',
-    description: 'Your SaaS Description',
+    description: 'Wordoken is a word game.',
     themeColor: '#ffffff',
     themeColorDark: '#0a0a0a',
     siteUrl: process.env.NEXT_PUBLIC_SITE_URL,

@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang={configuration.site.locale} className={getClassName()}>
+    <html lang={configuration.site.locale} className="">
       <head>
         <AdSense pId={'pub-6617299272110261'} />
       </head>
@@ -27,15 +27,15 @@ export default function RootLayout({
   );
 }
 
-function getClassName() {
-  const themeCookie = cookies().get('theme')?.value;
-  const theme = themeCookie ?? configuration.theme;
-  const dark = theme === 'light';
+// function getClassName() {
+//   const themeCookie = cookies().get('theme')?.value;
+//   const theme = themeCookie ?? configuration.theme;
+//   const dark = theme === 'light';
 
-  return classNames({
-    dark,
-  });
-}
+//   return classNames({
+//     dark,
+//   });
+// }
 
 export const metadata = {
   title: configuration.site.name,

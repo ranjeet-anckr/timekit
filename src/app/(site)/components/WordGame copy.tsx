@@ -12,7 +12,8 @@ import { ChevronRight } from 'lucide-react';
 import { data } from './data';
 import AdBanner from 'components/AdBanner';
 import { useForm } from 'react-hook-form';
-
+import getSupabaseBrowserClient from '~/core/supabase/browser-client';
+import { getWordData } from '~/lib/word/database/queries';
 
 type WordList = string[];
 
@@ -28,9 +29,8 @@ interface AdBannerProps {
 }
 
 const WordGame = () => {
-  const [wordDokenList, setWordDokenList] = useState<string[]>(
-    data[0].abcdefil.wordokenList,
-  );
+  const [loading, setLoading] = useState(false);
+  const [wordDokenList, setWordDokenList] = useState<string[]>([]);
   const [message, setMessage] = useState('');
   const [words, setWords] = useState<Words>({ rareWord: [], commonWord: [] });
   const { register, handleSubmit, formState } = useForm({
@@ -38,22 +38,6 @@ const WordGame = () => {
       word: '',
     },
   });
-
-  useEffect(() => {
-    const rareWords: string[] = [];
-    const commonWords: string[] = [];
-  
-    // Assuming data[0].abcdefil.wordDict is an object where keys are words and values are some numeric scores
-    Object.keys(data[0].abcdefil.wordDict).forEach((word: string) => {
-      if (data[0].abcdefil.wordDict[word] > 0.0) {
-        rareWords.push(word);
-      } else {
-        commonWords.push(word);
-      }
-    });
-    setWords({ rareWord: rareWords, commonWord: commonWords });
-  }, [data]);
-
   const errors = formState.errors;
   const wordControl = register('word', {
     required: 'This field is required',
@@ -67,7 +51,37 @@ const WordGame = () => {
     },
   });
 
-  const onSubmit = (data: { word: string }) => {};
+  const getData = async (word: string) => {
+    setLoading(true);
+    const client = getSupabaseBrowserClient();
+
+    const response = await getWordData(client, word);
+    if (response && response.length > 0) {
+      setMessage('');
+      const wordData = response[0];
+      if (wordData.wordokenlist) {
+        setWordDokenList(wordData.wordokenlist);
+      }
+      const rareWords: string[] = [];
+      const commonWords: string[] = [];
+      if (wordData.worddict) {
+        Object.keys(wordData.worddict).forEach((key: string) => {
+          if (wordData.worddict[key] > 0.0) {
+            rareWords.push(key);
+          } else {
+            commonWords.push(key);
+          }
+        });
+
+        setWords({ rareWord: rareWords, commonWord: commonWords });
+      }
+    } else {
+      setMessage('There is no matching word.');
+      setWords({ rareWord: [], commonWord: [] });
+    }
+
+    setLoading(false);
+  };
 
   const handleOnKeyDown = (event: React.KeyboardEvent) => {
     if (
@@ -86,8 +100,12 @@ const WordGame = () => {
     }
   };
 
+  const onSubmit = (data: { word: string }) => {
+    getData(data.word.trim().toLowerCase());
+  };
+
   return (
-    <div className="mt-10 flex flex-col align-center justify-center">
+    <div className="">
       <HeroTitle>
         <span className="bg-gradient-to-br bg-clip-text text-transparent from-primary-500 to-primary-900 leading-[1.2]">
           Wordoken
@@ -104,8 +122,8 @@ const WordGame = () => {
             type="text"
             className="uppercase font-bold text-lg"
             placeholder="Enter a word"
-            onKeyDown={handleOnKeyDown}
             maxLength={8}
+            onKeyDown={handleOnKeyDown}
             {...wordControl}
           />
           <TextField.Hint>
@@ -119,15 +137,23 @@ const WordGame = () => {
           variant="default"
           type="submit"
           className="font-bold text-lg"
-          disabled={Object.keys(errors).length > 0}
+          disabled={Object.keys(errors).length > 0 || loading}
         >
-          Submit
+          {loading ? 'Checking...' : 'Submit'}
         </Button>
       </form>
-
-      <Accordion type="single" collapsible className="w-full mt-10">
-        <AccordionItems words={words} wordDokenList={wordDokenList} />
-      </Accordion>
+      <div className="flex flex-row align-center justify-center mt-5">
+        {message && (
+          <p className="text-center text-lg font-bold text-red-500 mb-10">
+            {message}
+          </p>
+        )}
+      </div>
+      {words.rareWord.length > 0 && words.commonWord.length > 0 && (
+        <Accordion type="single" collapsible className="w-full mt-10">
+          <AccordionItems words={words} wordDokenList={wordDokenList} />
+        </Accordion>
+      )}
 
       <Button
         variant="link"
