@@ -43,16 +43,15 @@ const WordGame = () => {
     const rareWords: string[] = [];
     const commonWords: string[] = [];
   
-    // Assuming data[0].abcdefil.wordDict is an object where keys are words and values are some numeric scores
     Object.keys(data[0].abcdefil.wordDict).forEach((word: string) => {
-      if (data[0].abcdefil.wordDict[word] > 0.0) {
+      if ((data[0].abcdefil.wordDict as any)[word] > 0.0) {
         rareWords.push(word);
       } else {
         commonWords.push(word);
       }
     });
     setWords({ rareWord: rareWords, commonWord: commonWords });
-  }, [data]);
+  }, []);
 
   const errors = formState.errors;
   const wordControl = register('word', {
