@@ -84,7 +84,7 @@ const WordGame = () => {
   };
 
   const onSubmit = (data: { word: string }) => {
-    getData(data.word.trim());
+    getData(data.word.trim().toLowerCase());
   };
 
   return (
