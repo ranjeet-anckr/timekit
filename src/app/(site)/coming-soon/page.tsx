@@ -20,7 +20,7 @@ const ComingSoon = () => {
           <Image
             className="absolute inset-0 w-full h-full "
             layout="fill"
-            src="/assets/images/coming-soon.png"
+            src="/assets/images/background.png"
             alt="App Image"
             placeholder="empty"
           />
