@@ -150,7 +150,7 @@ const WordGame = () => {
         <AccordionItems words={words} wordDokenList={wordDokenList} />
       </Accordion>
       <div>
-        <Link href="https://wordokensolver.vercel.app" target="_blank">
+        <Link href="https://wordoken.vercel.app" target="_blank">
           <Button variant="link" className="bg-white font-bold text-lg">
             <span className="mr-2">Coming Soon</span>
             <ChevronRight />
