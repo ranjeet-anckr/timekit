@@ -20,7 +20,7 @@ const ComingSoon = () => {
           className="w-full h-screen bg-no-repeat bg-cover bg-center"
           style={backgroundStyle}
         >
-          <Link href="https://wordoken.vercel.app" target="_blank">
+          <Link href="https://wordokensolver.vercel.app" target="_blank">
             <Button
               variant="link"
               className="bg-customColor text-black font-bold text-lg rounded-none border-2 border-black mt-10 ml-10"
