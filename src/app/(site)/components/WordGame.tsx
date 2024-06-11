@@ -13,7 +13,6 @@ import { data } from './data';
 import AdBanner from 'components/AdBanner';
 import { useForm } from 'react-hook-form';
 
-
 type WordList = string[];
 
 interface Words {
@@ -31,7 +30,7 @@ const WordGame = () => {
   const [wordDokenList, setWordDokenList] = useState<string[]>(
     data[0].abcdefil.wordokenList,
   );
-  const [message, setMessage] = useState('');
+  const [text, setText] = useState('');
   const [words, setWords] = useState<Words>({ rareWord: [], commonWord: [] });
   const { register, handleSubmit, formState } = useForm({
     defaultValues: {
@@ -42,7 +41,7 @@ const WordGame = () => {
   useEffect(() => {
     const rareWords: string[] = [];
     const commonWords: string[] = [];
-  
+
     Object.keys(data[0].abcdefil.wordDict).forEach((word: string) => {
       if ((data[0].abcdefil.wordDict as any)[word] > 0.0) {
         rareWords.push(word);
@@ -66,7 +65,9 @@ const WordGame = () => {
     },
   });
 
-  const onSubmit = (data: { word: string }) => {};
+  const onSubmit = (data: { word: string }) => {
+    setText(data.word);
+  };
 
   const handleOnKeyDown = (event: React.KeyboardEvent) => {
     if (
@@ -87,11 +88,19 @@ const WordGame = () => {
 
   return (
     <div className="mt-10 flex flex-col align-center justify-center">
-      <HeroTitle>
-        <span className="bg-gradient-to-br bg-clip-text text-transparent from-primary-500 to-primary-900 leading-[1.2]">
-          Wordoken
-        </span>
-      </HeroTitle>
+      <div className={'flex w-full flex-1 flex-col items-center space-y-2'}>
+        <HeroTitle>
+          <div className="flex flex-col">
+            <span className="bg-gradient-to-br bg-clip-text text-transparent from-primary-500 to-primary-900 leading-[1.2]">
+              Wordoken Solver
+            </span>
+          </div>
+        </HeroTitle>
+        <Pill>
+          <span>{`Get answers to Wordoken word game puzzles! Our solver helps you find words quickly and get gentle hints, Also works for New York Times' Spelling Bee.`}</span>
+        </Pill>
+      </div>
+
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="mt-10 flex flex-row align-center justify-center space-x-3 md:space-x-8"
@@ -101,8 +110,8 @@ const WordGame = () => {
           <TextField.Input
             required
             type="text"
-            className="uppercase font-bold text-lg"
-            placeholder="Enter a word"
+            className="uppercase font-bold text-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring"
+            placeholder="ENTER PUZZLE LETTERS"
             onKeyDown={handleOnKeyDown}
             maxLength={8}
             {...wordControl}
@@ -123,6 +132,15 @@ const WordGame = () => {
           Submit
         </Button>
       </form>
+      {text && (
+        <div className="flex flex-row items-center justify-center space-x-2 mt-5">
+          {text.split('').map((char, index) => (
+            <div key={index} className="rounded-full border w-auto p-3 uppercase font-bold cursor-pointer">
+              {char}
+            </div>
+          ))}
+        </div>
+      )}
 
       <Accordion type="single" collapsible className="w-full mt-10">
         <AccordionItems words={words} wordDokenList={wordDokenList} />
@@ -130,7 +148,7 @@ const WordGame = () => {
 
       <Button
         variant="link"
-        href="/coming-soon"
+        href="https://wordokensolver.vercel.app"
         className="bg-white font-bold text-lg"
       >
         <span className="mr-2">Coming Soon</span>
@@ -198,20 +216,6 @@ function AccordionItems({ words, wordDokenList }: AccordionItemsProps) {
         <AccordionContent className="text-base md:text-lg">
           <div className="pl-4">
             <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="item-1" className="border-b">
-                <AccordionTrigger className="text-medium text-base md:text-xl text-left">
-                  Show Rare Words
-                </AccordionTrigger>
-                <AccordionContent className="text-base md:text-lg">
-                  <div className="text-center flex flex-row flex-wrap space-x-2 md:space-x-4">
-                    {words.rareWord.map((item, index) => (
-                      <div key={index} className="p-1 border-2 rounded-lg mt-2">
-                        {item}
-                      </div>
-                    ))}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
               <AccordionItem value="item-2" className="border-b">
                 <AccordionTrigger className="text-medium text-base md:text-xl text-left">
                   Show Common Words
@@ -226,10 +230,40 @@ function AccordionItems({ words, wordDokenList }: AccordionItemsProps) {
                   </div>
                 </AccordionContent>
               </AccordionItem>
+              <AccordionItem value="item-1" className="border-b">
+                <AccordionTrigger className="text-medium text-base md:text-xl text-left">
+                  Show Rare Words
+                </AccordionTrigger>
+                <AccordionContent className="text-base md:text-lg">
+                  <div className="text-center flex flex-row flex-wrap space-x-2 md:space-x-4">
+                    {words.rareWord.map((item, index) => (
+                      <div key={index} className="p-1 border-2 rounded-lg mt-2">
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
             </Accordion>
           </div>
         </AccordionContent>
       </AccordionItem>
     </>
+  );
+}
+
+function Pill(props: React.PropsWithChildren) {
+  return (
+    <h2
+      className={
+        'inline-flex w-auto  md:w-1/2 items-center space-x-2' +
+        ' rounded-full bg-gradient-to-br dark:from-gray-200 dark:via-gray-400' +
+        ' dark:to-gray-700 bg-clip-text px-4 py-2 text-center text-sm' +
+        ' font-normal text-gray-500 dark:text-transparent shadow' +
+        ' dark:shadow-dark-700'
+      }
+    >
+      <span>{props.children}</span>
+    </h2>
   );
 }

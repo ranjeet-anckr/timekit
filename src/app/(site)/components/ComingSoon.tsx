@@ -21,7 +21,7 @@ const ComingSoon = () => {
         >
           <Button
             variant="link"
-            href="/"
+            href="https://wordoken.vercel.app"
             className="bg-customColor text-black font-bold text-lg rounded-none border-2 border-black mt-10 ml-10"
           >
             <ChevronLeft />
@@ -57,7 +57,7 @@ const ComingSoon = () => {
                   Notify Me!
                 </Button>
               </div>
-              <div className="flex flex-row gap-2 mt-20">
+              <div className="flex flex-row gap-2 mt-5">
                 {['facebook', 'twitter', 'instagram', 'tiktok'].map(
                   (platform) => (
                     <img
