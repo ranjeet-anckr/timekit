@@ -4,18 +4,14 @@ import Container from '~/core/ui/Container';
 import WordGame from './WordGame';
 import ComingSoon from './ComingSoon';
 import If from '~/core/ui/If';
+import configuration from '~/configuration';
 
 const GamePage = () => {
-  const [url, setUrl] = useState('');
-  useEffect(() => {
-    setUrl(window.location.href);
-    console.log('url', window.location.href);
-  }, []);
-
+    const newUrl = configuration.site.siteUrl;
   return (
     <div>
       <If
-        condition={url === 'https://wordokensolver.vercel.app'}
+        condition={newUrl === 'https://wordokensolver.vercel.app'}
         fallback={<ComingSoon />}
       >
         <div className={'flex flex-col space-y-16'}>
