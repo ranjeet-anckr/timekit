@@ -20,7 +20,7 @@ const ComingSoon = () => {
           className="w-full h-screen bg-no-repeat bg-cover bg-center"
           style={backgroundStyle}
         >
-          <Link href="https://wordokensolver.vercel.app" target="_blank">
+          {/* <Link href="https://wordokensolver.vercel.app" target="_blank">
             <Button
               variant="link"
               className="bg-customColor text-black font-bold text-lg rounded-none border-2 border-black mt-10 ml-10"
@@ -28,7 +28,7 @@ const ComingSoon = () => {
               <ChevronLeft />
               <span className="ml-2">Back to HomePage</span>
             </Button>
-          </Link>
+          </Link> */}
           <div className="flex justify-center">
             <div className="flex flex-col items-center justify-center w-full md:w-1/2 text-center h-full p-4">
               <img
