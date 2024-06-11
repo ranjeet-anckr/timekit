@@ -40,6 +40,7 @@ module.exports = {
           foreground: 'hsl(var(--primary-foreground))',
           ...colors.violet,
         },
+        customColor: '#6FB186',
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
           foreground: 'hsl(var(--secondary-foreground))',
