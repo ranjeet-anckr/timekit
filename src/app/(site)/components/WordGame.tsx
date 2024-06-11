@@ -149,14 +149,13 @@ const WordGame = () => {
       <Accordion type="single" collapsible className="w-full mt-10">
         <AccordionItems words={words} wordDokenList={wordDokenList} />
       </Accordion>
-      <div>
-        <Link href="https://wordoken.vercel.app" target="_blank">
-          <Button variant="link" className="bg-white font-bold text-lg">
-            <span className="mr-2">Coming Soon</span>
-            <ChevronRight />
-          </Button>
+
+      <Button variant="link" className="bg-white font-bold text-lg">
+        <Link href="https://wordoken.vercel.app" target="_blank" className='flex flex-row'>
+          <span className="mr-2">Coming Soon</span>
+          <ChevronRight />
         </Link>
-      </div>
+      </Button>
 
       <div className="bg-black mb-5">
         <AdBanner

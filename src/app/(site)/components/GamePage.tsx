@@ -10,16 +10,16 @@ const GamePage = () => {
     const newUrl = configuration.site.siteUrl;
   return (
     <div>
-      <If
+      {/* <If
         condition={newUrl === 'https://wordokensolver.vercel.app'}
         fallback={<ComingSoon />}
-      >
+      > */}
         <div className={'flex flex-col space-y-16'}>
           <Container>
             <WordGame />
           </Container>
         </div>
-      </If>
+      {/* </If> */}
     </div>
   );
 };
