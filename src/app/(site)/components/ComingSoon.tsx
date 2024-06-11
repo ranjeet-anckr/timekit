@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import React from 'react';
 import { ChevronLeft } from 'lucide-react';
 import Container from '~/core/ui/Container';
@@ -6,6 +6,7 @@ import Button from '~/core/ui/Button';
 import Heading from '~/core/ui/Heading';
 import SubHeading from '~/core/ui/SubHeading';
 import TextField from '~/core/ui/TextField';
+import Link from 'next/link';
 
 const ComingSoon = () => {
   const backgroundStyle = {
@@ -19,14 +20,15 @@ const ComingSoon = () => {
           className="w-full h-screen bg-no-repeat bg-cover bg-center"
           style={backgroundStyle}
         >
-          <Button
-            variant="link"
-            href="https://wordoken.vercel.app"
-            className="bg-customColor text-black font-bold text-lg rounded-none border-2 border-black mt-10 ml-10"
-          >
-            <ChevronLeft />
-            <span className="ml-2">Back to HomePage</span>
-          </Button>
+          <Link href="https://wordoken.vercel.app" target="_blank">
+            <Button
+              variant="link"
+              className="bg-customColor text-black font-bold text-lg rounded-none border-2 border-black mt-10 ml-10"
+            >
+              <ChevronLeft />
+              <span className="ml-2">Back to HomePage</span>
+            </Button>
+          </Link>
           <div className="flex justify-center">
             <div className="flex flex-col items-center justify-center w-full md:w-1/2 text-center h-full p-4">
               <img

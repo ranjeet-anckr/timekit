@@ -12,6 +12,7 @@ import { ChevronRight } from 'lucide-react';
 import { data } from './data';
 import AdBanner from 'components/AdBanner';
 import { useForm } from 'react-hook-form';
+import Link from 'next/link';
 
 type WordList = string[];
 
@@ -135,7 +136,10 @@ const WordGame = () => {
       {text && (
         <div className="flex flex-row items-center justify-center space-x-2 mt-5">
           {text.split('').map((char, index) => (
-            <div key={index} className="rounded-full border w-auto p-3 uppercase font-bold cursor-pointer">
+            <div
+              key={index}
+              className="rounded-full border w-auto p-3 uppercase font-bold cursor-pointer"
+            >
               {char}
             </div>
           ))}
@@ -145,15 +149,13 @@ const WordGame = () => {
       <Accordion type="single" collapsible className="w-full mt-10">
         <AccordionItems words={words} wordDokenList={wordDokenList} />
       </Accordion>
+      <Link href="https://wordokensolver.vercel.app" target='_blank'>
+        <Button variant="link" className="bg-white font-bold text-lg">
+          <span className="mr-2">Coming Soon</span>
+          <ChevronRight />
+        </Button>
+      </Link>
 
-      <Button
-        variant="link"
-        href="https://wordokensolver.vercel.app"
-        className="bg-white font-bold text-lg"
-      >
-        <span className="mr-2">Coming Soon</span>
-        <ChevronRight />
-      </Button>
       <div className="bg-black mb-5">
         <AdBanner
           dataAdFormat="auto"
