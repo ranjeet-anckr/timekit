@@ -76,9 +76,8 @@ const WordGame = () => {
 
   const onSubmit = (data: { word: string }) => {
     const { word } = data;
-
     const capitalLetter = findSingleCapitalLetter(word);
-    setActiveChar(capitalLetter);
+    setActiveChar(capitalLetter.toLowerCase());
     setText(word);
   };
 
@@ -99,7 +98,7 @@ const WordGame = () => {
     }
   };
 
-  const uniqueChars = Array.from(new Set(text.split('')));
+  const uniqueChars = Array.from(new Set(text.toLowerCase().split('')));
 
   return (
     <div className="mt-10 flex flex-col align-center justify-center">
@@ -132,8 +131,7 @@ const WordGame = () => {
             {...wordControl}
           />
           <TextField.Hint>
-            Text should be a minimum of 6 letters and a maximum of 8
-            letters.{' '}
+            Text should be a minimum of 6 letters and a maximum of 8 letters.{' '}
           </TextField.Hint>
           <TextField.Error error={errors.word?.message} />
         </TextField>
@@ -150,7 +148,7 @@ const WordGame = () => {
       {text && (
         <div>
           <Label className="flex flex-row items-center justify-center space-x-2 mt-5">
-          Select fixed letter
+            Select fixed letter
           </Label>
 
           <div className="flex flex-row items-center justify-center space-x-2 mt-5">
@@ -170,7 +168,7 @@ const WordGame = () => {
                     </div>
                   </TooltipTrigger>
                   {char != activeChar && (
-                    <TooltipContent className='font-bold text-center bg-primary'>
+                    <TooltipContent className="font-bold text-center bg-primary">
                       {`Make ${char.toUpperCase()}  fixed letter`}
                     </TooltipContent>
                   )}
