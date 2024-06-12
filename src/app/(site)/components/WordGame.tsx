@@ -32,6 +32,7 @@ const WordGame = () => {
     data[0].abcdefil.wordokenList,
   );
   const [text, setText] = useState('');
+  const [activeChar, setActiveChar] = useState('');
   const [words, setWords] = useState<Words>({ rareWord: [], commonWord: [] });
   const { register, handleSubmit, formState } = useForm({
     defaultValues: {
@@ -67,6 +68,7 @@ const WordGame = () => {
   });
 
   const onSubmit = (data: { word: string }) => {
+    setActiveChar("")
     setText(data.word);
   };
 
@@ -87,6 +89,9 @@ const WordGame = () => {
     }
   };
 
+  const uniqueChars = Array.from(new Set(text.split('')));
+  console.log('activeChar', activeChar);
+
   return (
     <div className="mt-10 flex flex-col align-center justify-center">
       <div className={'flex w-full flex-1 flex-col items-center space-y-2'}>
@@ -98,7 +103,7 @@ const WordGame = () => {
           </div>
         </HeroTitle>
         <Pill>
-          <span>{`Get answers to Wordoken word game puzzles! Our solver helps you find words quickly and get gentle hints, Also works for New York Times' Spelling Bee.`}</span>
+          <span>{`Get answers to Wordoken word game puzzles! Our solver helps you find words quickly and get gentle hints. Also works for New York Times Spelling Bee.`}</span>
         </Pill>
       </div>
 
@@ -135,10 +140,13 @@ const WordGame = () => {
       </form>
       {text && (
         <div className="flex flex-row items-center justify-center space-x-2 mt-5">
-          {text.split('').map((char, index) => (
+          {uniqueChars.map((char, index) => (
             <div
               key={index}
-              className="rounded-full border w-auto p-3 uppercase font-bold cursor-pointer"
+              className={`rounded-full border border-gray-300 w-auto px-4 py-2 m-1 uppercase font-bold cursor-pointer ${
+                char === activeChar ? 'bg-primary text-white' : 'bg-white'
+              }`}
+              onClick={() => setActiveChar(char)}
             >
               {char}
             </div>
@@ -151,7 +159,11 @@ const WordGame = () => {
       </Accordion>
 
       <Button variant="link" className="bg-white font-bold text-lg">
-        <Link href="https://wordoken.vercel.app" target="_blank" className='flex flex-row'>
+        <Link
+          href="https://wordoken.vercel.app"
+          target="_blank"
+          className="flex flex-row"
+        >
           <span className="mr-2">Coming Soon</span>
           <ChevronRight />
         </Link>
