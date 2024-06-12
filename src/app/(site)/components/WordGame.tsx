@@ -13,6 +13,8 @@ import { data } from './data';
 import AdBanner from 'components/AdBanner';
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
+import Label from '~/core/ui/Label';
+import { Tooltip, TooltipTrigger, TooltipContent } from '~/core/ui/Tooltip';
 
 type WordList = string[];
 
@@ -59,17 +61,25 @@ const WordGame = () => {
     required: 'This field is required',
     minLength: {
       value: 6,
-      message: 'Word must be at least 6 characters',
+      message: 'Word must be at least 6 letters',
     },
     maxLength: {
       value: 8,
-      message: 'Word must be no more than 8 characters',
+      message: 'Word must be no more than 8 letters',
     },
   });
 
+  const findSingleCapitalLetter = (inputWord: string) => {
+    const matches = inputWord.match(/[A-Z]/g);
+    return matches && matches.length === 1 ? matches[0] : '';
+  };
+
   const onSubmit = (data: { word: string }) => {
-    setActiveChar("")
-    setText(data.word);
+    const { word } = data;
+
+    const capitalLetter = findSingleCapitalLetter(word);
+    setActiveChar(capitalLetter);
+    setText(word);
   };
 
   const handleOnKeyDown = (event: React.KeyboardEvent) => {
@@ -90,7 +100,6 @@ const WordGame = () => {
   };
 
   const uniqueChars = Array.from(new Set(text.split('')));
-  console.log('activeChar', activeChar);
 
   return (
     <div className="mt-10 flex flex-col align-center justify-center">
@@ -116,15 +125,15 @@ const WordGame = () => {
           <TextField.Input
             required
             type="text"
-            className="uppercase font-bold text-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring"
-            placeholder="ENTER PUZZLE LETTERS"
+            className="font-bold text-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring"
+            placeholder="Enter Puzzle Letters"
             onKeyDown={handleOnKeyDown}
             maxLength={8}
             {...wordControl}
           />
           <TextField.Hint>
-            Text should be a minimum of 6 characters and a maximum of 8
-            characters.{' '}
+            Text should be a minimum of 6 letters and a maximum of 8
+            letters.{' '}
           </TextField.Hint>
           <TextField.Error error={errors.word?.message} />
         </TextField>
@@ -139,18 +148,36 @@ const WordGame = () => {
         </Button>
       </form>
       {text && (
-        <div className="flex flex-row items-center justify-center space-x-2 mt-5">
-          {uniqueChars.map((char, index) => (
-            <div
-              key={index}
-              className={`rounded-full border border-gray-300 w-auto px-4 py-2 m-1 uppercase font-bold cursor-pointer ${
-                char === activeChar ? 'bg-primary text-white' : 'bg-white'
-              }`}
-              onClick={() => setActiveChar(char)}
-            >
-              {char}
-            </div>
-          ))}
+        <div>
+          <Label className="flex flex-row items-center justify-center space-x-2 mt-5">
+          Select fixed letter
+          </Label>
+
+          <div className="flex flex-row items-center justify-center space-x-2 mt-5">
+            {uniqueChars.map((char, index) => (
+              <div key={index}>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div
+                      className={`rounded-full border border-gray-300 w-auto px-4 py-2 m-1 uppercase font-bold cursor-pointer ${
+                        char === activeChar
+                          ? 'bg-primary text-white'
+                          : 'bg-white'
+                      }`}
+                      onClick={() => setActiveChar(char)}
+                    >
+                      {char}
+                    </div>
+                  </TooltipTrigger>
+                  {char != activeChar && (
+                    <TooltipContent className='font-bold text-center bg-primary'>
+                      {`Make ${char.toUpperCase()}  fixed letter`}
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
