@@ -195,11 +195,11 @@ const WordGame = () => {
       </Button>
 
       <div className="bg-black mb-5">
-        <AdBanner
+        {/* <AdBanner
           dataAdFormat="auto"
           dataFullWidthResponsive={true}
           dataAdSlot="4730621222"
-        />
+        /> */}
       </div>
     </div>
   );

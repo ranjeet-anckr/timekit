@@ -32,8 +32,8 @@ const AdBanner: React.FC<AdBannerProps> = ({
 
   return (
     <ins
-      className="adsbygoogle"
-      style={{ display: 'inline-block', width: '728px', height: '90px' }}
+      className="adsbygoogle "
+      style={{ display: 'inline-block', width: '46px', height: '90px' }}
       data-ad-client="ca-pub-6617299272110261"
       data-ad-slot={dataAdSlot}
       data-ad-format={dataAdFormat}
