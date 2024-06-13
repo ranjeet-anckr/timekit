@@ -63,17 +63,24 @@ const WordGame = () => {
     },
   });
 
-  const findSingleCapitalLetter = (inputWord: string) => {
-    const matches = inputWord.match(/[A-Z]/g);
-    return matches && matches.length === 1 ? matches[0] : '';
+  const findCapitalLetters = (inputWord: string) => {
+    return inputWord.match(/[A-Z]/g) || [];
   };
-
+  
   const onSubmit = (data: { word: string }) => {
     const { word } = data;
-    const capitalLetter = findSingleCapitalLetter(word);
-    setActiveChars(capitalLetter ? [capitalLetter.toLowerCase()] : []);
+    const capitalLetters = findCapitalLetters(word);
+  
+    if (word.length === 8 && capitalLetters.length === 2) {
+      setActiveChars(capitalLetters.map(letter => letter.toLowerCase()));
+    } else if (capitalLetters.length === 1) {
+      setActiveChars([capitalLetters[0].toLowerCase()]);
+    } else {
+      setActiveChars([]);
+    }
     setText(word);
   };
+  
 
   const handleOnKeyDown = (event: React.KeyboardEvent) => {
     if (
@@ -102,7 +109,7 @@ const WordGame = () => {
   };
 
   const uniqueChars = Array.from(new Set(text.toLowerCase().split('')));
-  console.log('uniqueChars.length ', uniqueChars.length);
+ 
   return (
     <div className="p-2 md:p-0 mt-10 flex flex-col align-center justify-center">
       <div className={'flex w-full flex-1 flex-col items-center space-y-2'}>
