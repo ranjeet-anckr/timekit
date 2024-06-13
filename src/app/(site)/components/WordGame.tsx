@@ -173,7 +173,7 @@ const WordGame = () => {
             Select fixed letter{text.length === 8 && 's (up to 2)'}
           </Label>
 
-          <div className="flex flex-row items-center justify-center space-x-2 mt-5">
+          <div className="flex flex-row items-center justify-center space-x-2 mt-5 flex-wrap">
             {uniqueChars.map((char, index) => (
               <div key={index}>
                 <Tooltip>
