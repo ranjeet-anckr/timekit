@@ -23,18 +23,12 @@ interface Words {
   commonWord: WordList;
 }
 
-interface AdBannerProps {
-  dataAdSlot: string;
-  dataAdFormat: string;
-  dataFullWidthResponsive: boolean;
-}
-
 const WordGame = () => {
   const [wordDokenList, setWordDokenList] = useState<string[]>(
     data[0].abcdefil.wordokenList,
   );
   const [text, setText] = useState('');
-  const [activeChar, setActiveChar] = useState('');
+  const [activeChars, setActiveChars] = useState<string[]>([]);
   const [words, setWords] = useState<Words>({ rareWord: [], commonWord: [] });
   const { register, handleSubmit, formState } = useForm({
     defaultValues: {
@@ -77,7 +71,7 @@ const WordGame = () => {
   const onSubmit = (data: { word: string }) => {
     const { word } = data;
     const capitalLetter = findSingleCapitalLetter(word);
-    setActiveChar(capitalLetter.toLowerCase());
+    setActiveChars(capitalLetter ? [capitalLetter.toLowerCase()] : []);
     setText(word);
   };
 
@@ -98,10 +92,19 @@ const WordGame = () => {
     }
   };
 
-  const uniqueChars = Array.from(new Set(text.toLowerCase().split('')));
+  const handleCharClick = (char: string) => {
+    const maxChars = text.length === 8 ? 2 : 1;
+    if (activeChars.includes(char)) {
+      setActiveChars(activeChars.filter((c) => c !== char));
+    } else if (activeChars.length < maxChars) {
+      setActiveChars([...activeChars, char]);
+    }
+  };
 
+  const uniqueChars = Array.from(new Set(text.toLowerCase().split('')));
+  console.log('uniqueChars.length ', uniqueChars.length);
   return (
-    <div className="mt-10 flex flex-col align-center justify-center">
+    <div className="p-2 md:p-0 mt-10 flex flex-col align-center justify-center">
       <div className={'flex w-full flex-1 flex-col items-center space-y-2'}>
         <HeroTitle>
           <div className="flex flex-col">
@@ -111,44 +114,63 @@ const WordGame = () => {
           </div>
         </HeroTitle>
         <Pill>
-          <span>{`Get answers to Wordoken word game puzzles! Our solver helps you find words quickly and get gentle hints. Also works for New York Times Spelling Bee.`}</span>
+          <span>
+            Get answers to
+            <Link
+              href="https://wordoken.vercel.app"
+              target="_blank"
+              className="px-1 text-primary hover:underline"
+            >
+              Wordoken word game
+            </Link>
+            puzzles! Our solver helps you find words quickly and get gentle
+            hints. Also works for New York Times Spelling Bee.
+          </span>
         </Pill>
       </div>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="mt-10 flex flex-row align-center justify-center space-x-3 md:space-x-8"
+        className="mt-10 flex flex-col items-center"
         noValidate
       >
-        <TextField>
-          <TextField.Input
-            required
-            type="text"
-            className="font-bold text-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring"
-            placeholder="Enter Puzzle Letters"
-            onKeyDown={handleOnKeyDown}
-            maxLength={8}
-            {...wordControl}
-          />
-          <TextField.Hint>
-            Text should be a minimum of 6 letters and a maximum of 8 letters.{' '}
-          </TextField.Hint>
-          <TextField.Error error={errors.word?.message} />
-        </TextField>
+        <div className="flex flex-row space-x-3 md:space-x-8 items-center justify-center">
+          <TextField>
+            <TextField.Input
+              required
+              type="text"
+              className="font-bold text-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring"
+              placeholder="Enter Puzzle Letters"
+              onKeyDown={handleOnKeyDown}
+              maxLength={8}
+              {...wordControl}
+            />
+          </TextField>
 
-        <Button
-          variant="default"
-          type="submit"
-          className="font-bold text-lg"
-          disabled={Object.keys(errors).length > 0}
-        >
-          Submit
-        </Button>
+          <Button
+            variant="default"
+            type="submit"
+            className="font-bold text-lg"
+            disabled={Object.keys(errors).length > 0}
+          >
+            Submit
+          </Button>
+        </div>
+        <div className="text-left mt-3">
+          <TextField.Error error={errors.word?.message} />
+          <TextField.Hint>
+            Text should be a minimum of 6 letters and a maximum of 8 letters.
+          </TextField.Hint>
+          <TextField.Hint>
+            Capitalize required letter(s) for better results.
+          </TextField.Hint>
+        </div>
       </form>
+
       {text && (
         <div>
           <Label className="flex flex-row items-center justify-center space-x-2 mt-5">
-            Select fixed letter
+            Select fixed letter{text.length === 8 && 's (up to 2)'}
           </Label>
 
           <div className="flex flex-row items-center justify-center space-x-2 mt-5">
@@ -158,18 +180,18 @@ const WordGame = () => {
                   <TooltipTrigger>
                     <div
                       className={`rounded-full border border-gray-300 w-auto px-4 py-2 m-1 uppercase font-bold cursor-pointer ${
-                        char === activeChar
+                        activeChars.includes(char)
                           ? 'bg-primary text-white'
                           : 'bg-white'
                       }`}
-                      onClick={() => setActiveChar(char)}
+                      onClick={() => handleCharClick(char)}
                     >
                       {char}
                     </div>
                   </TooltipTrigger>
-                  {char != activeChar && (
+                  {!activeChars.includes(char) && (
                     <TooltipContent className="font-bold text-center bg-primary">
-                      {`Make ${char.toUpperCase()}  fixed letter`}
+                      {`Make ${char.toUpperCase()} a fixed letter`}
                     </TooltipContent>
                   )}
                 </Tooltip>
@@ -194,7 +216,7 @@ const WordGame = () => {
         </Link>
       </Button>
 
-      <div className="bg-black mb-5">
+      <div className="bg-black mb-5 w-full h-48 md:h-64">
         {/* <AdBanner
           dataAdFormat="auto"
           dataFullWidthResponsive={true}

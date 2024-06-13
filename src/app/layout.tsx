@@ -17,7 +17,13 @@ export default function RootLayout({
   return (
     <html lang={configuration.site.locale} className="">
       <head>
-        <AdSense pId={'pub-6617299272110261'} />
+        {configuration.environment === 'production' && (
+          <script
+            async
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6617299272110261"
+            crossOrigin="anonymous"
+          ></script>
+        )}
       </head>
       <Fonts />
       <ThemeSetter />
