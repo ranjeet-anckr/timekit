@@ -177,7 +177,7 @@ const WordGame = () => {
       {text && (
         <div>
           <Label className="flex flex-row items-center justify-center space-x-2 mt-5">
-            Select fixed letter{text.length === 8 && 's (up to 2)'}
+            {text.length === 8 ? 'Select both required letters.': 'Select required letter.'}
           </Label>
 
           <div className="flex flex-row items-center justify-center space-x-2 mt-5 flex-wrap">
@@ -223,13 +223,13 @@ const WordGame = () => {
         </Link>
       </Button>
 
-      <div className="bg-black mb-5 w-full h-48 md:h-64">
-        {/* <AdBanner
+      {/* <div className="bg-black mb-5 w-full h-48 md:h-64">
+        <AdBanner
           dataAdFormat="auto"
           dataFullWidthResponsive={true}
           dataAdSlot="4730621222"
-        /> */}
-      </div>
+        />
+      </div> */}
     </div>
   );
 };
