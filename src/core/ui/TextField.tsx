@@ -7,11 +7,13 @@ import Label from './Label';
 
 type Props = React.InputHTMLAttributes<unknown>;
 
-const Hint: React.FC<React.PropsWithChildren> = ({ children }) => {
+const Hint: React.FC<React.PropsWithChildren<{ className?: string }>> = ({ children, className }) => {
   return (
     <span
-      className={`block pl-1 text-xs
-        font-normal leading-tight text-gray-500 dark:text-gray-400 mt-1`}
+      className={classNames(
+        'block pl-1 text-xs font-normal leading-tight text-gray-500 dark:text-gray-400',
+        className
+      )}
     >
       {children}
     </span>
@@ -53,8 +55,8 @@ const TextField: TextFieldComponent = ({ children, className }) => {
 };
 
 const ErrorMessage: React.FC<
-  { error: Maybe<string> } & React.HTMLAttributes<unknown>
-> = ({ error, ...props }) => {
+  { error: Maybe<string>; className?: string } & React.HTMLAttributes<unknown>
+> = ({ error, className, ...props }) => {
   const shouldDisplay = !!error;
 
   if (!shouldDisplay) {
@@ -62,8 +64,8 @@ const ErrorMessage: React.FC<
   }
 
   return (
-    <Hint>
-      <span {...props} className={'py-0.5 text-red-700 dark:text-red-500'}>
+    <Hint className={className}>
+      <span {...props} className={classNames('py-0.5 text-red-700 dark:text-red-500', className)}>
         {error}
       </span>
     </Hint>

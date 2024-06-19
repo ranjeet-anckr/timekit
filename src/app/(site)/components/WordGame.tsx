@@ -15,6 +15,7 @@ import { useForm } from 'react-hook-form';
 import Link from 'next/link';
 import Label from '~/core/ui/Label';
 import { Tooltip, TooltipTrigger, TooltipContent } from '~/core/ui/Tooltip';
+import Container from '~/core/ui/Container';
 
 type WordList = string[];
 
@@ -66,13 +67,13 @@ const WordGame = () => {
   const findCapitalLetters = (inputWord: string) => {
     return inputWord.match(/[A-Z]/g) || [];
   };
-  
+
   const onSubmit = (data: { word: string }) => {
     const { word } = data;
     const capitalLetters = findCapitalLetters(word);
-  
+
     if (word.length === 8 && capitalLetters.length === 2) {
-      setActiveChars(capitalLetters.map(letter => letter.toLowerCase()));
+      setActiveChars(capitalLetters.map((letter) => letter.toLowerCase()));
     } else if (capitalLetters.length === 1) {
       setActiveChars([capitalLetters[0].toLowerCase()]);
     } else {
@@ -80,7 +81,6 @@ const WordGame = () => {
     }
     setText(word);
   };
-  
 
   const handleOnKeyDown = (event: React.KeyboardEvent) => {
     if (
@@ -109,7 +109,7 @@ const WordGame = () => {
   };
 
   const uniqueChars = Array.from(new Set(text.toLowerCase().split('')));
- 
+
   return (
     <div className="p-2 md:p-0 mt-10 flex flex-col align-center justify-center">
       <div className={'flex w-full flex-1 flex-col items-center space-y-2'}>
@@ -164,12 +164,19 @@ const WordGame = () => {
           </Button>
         </div>
         <div className="text-left mt-3">
-          <TextField.Error error={errors.word?.message} />
-          <TextField.Hint>
-            Text should be a minimum of 6 letters and a maximum of 8 letters.
+          <TextField.Error error={errors.word?.message} className="-mt-1 ml-2" />
+          <TextField.Hint className="mt-3 ml-3">
+            <ul className="list-disc pl-5">
+              <li>
+                Text should be a minimum of 6 letters and a maximum of 8
+                letters.
+              </li>
+            </ul>
           </TextField.Hint>
-          <TextField.Hint>
-            Capitalize required letter(s) for better results.
+          <TextField.Hint className="mt-1 ml-3">
+            <ul className="list-disc pl-5">
+              <li>Capitalize required letter(s) for better results.</li>
+            </ul>
           </TextField.Hint>
         </div>
       </form>
@@ -177,7 +184,9 @@ const WordGame = () => {
       {text && (
         <div>
           <Label className="flex flex-row items-center justify-center space-x-2 mt-5">
-            {text.length === 8 ? 'Select both required letters.': 'Select required letter.'}
+            {text.length === 8
+              ? 'Select both required letters.'
+              : 'Select required letter.'}
           </Label>
 
           <div className="flex flex-row items-center justify-center space-x-2 mt-5 flex-wrap">
@@ -198,7 +207,7 @@ const WordGame = () => {
                   </TooltipTrigger>
                   {!activeChars.includes(char) && (
                     <TooltipContent className="font-bold text-center bg-primary">
-                      {`Make ${char.toUpperCase()} a fixed letter`}
+                      {`Make ${char.toUpperCase()} a required letter`}
                     </TooltipContent>
                   )}
                 </Tooltip>
@@ -207,10 +216,11 @@ const WordGame = () => {
           </div>
         </div>
       )}
-
-      <Accordion type="single" collapsible className="w-full mt-10">
-        <AccordionItems words={words} wordDokenList={wordDokenList} />
-      </Accordion>
+      <Container>
+        <Accordion type="single" collapsible className="w-full mt-10">
+          <AccordionItems words={words} wordDokenList={wordDokenList} />
+        </Accordion>
+      </Container>
 
       <Button variant="link" className="bg-white font-bold text-lg">
         <Link
@@ -256,20 +266,20 @@ interface AccordionItemsProps {
 function AccordionItems({ words, wordDokenList }: AccordionItemsProps) {
   return (
     <>
-      <AccordionItem value="item-1" className="border-b">
-        <AccordionTrigger className="text-medium text-base md:text-xl text-left">
+      <AccordionItem value="item-1" className="border-b w-full">
+        <AccordionTrigger className="text-medium text-base md:text-xl text-left w-full">
           Show Wordoken Hint
         </AccordionTrigger>
-        <AccordionContent className="text-base md:text-lg">
+        <AccordionContent className="text-base md:text-lg w-full">
           Critical assessment of a process or activity or of their result.
         </AccordionContent>
       </AccordionItem>
-      <AccordionItem value="item-2" className="border-b">
-        <AccordionTrigger className="text-medium text-base md:text-xl text-left">
+      <AccordionItem value="item-2" className="border-b w-full">
+        <AccordionTrigger className="text-medium text-base md:text-xl text-left w-full">
           Show Wordoken
         </AccordionTrigger>
-        <AccordionContent className="text-base md:text-lg">
-          <div className="text-center flex flex-row flex-wrap space-x-2 md:space-x-4">
+        <AccordionContent className="text-base md:text-lg w-full">
+          <div className="text-center flex flex-row flex-wrap space-x-2 md:space-x-4 w-full">
             {wordDokenList.map((item, index) => (
               <div key={index} className="p-1 border-2 rounded-lg mt-2">
                 {item}
@@ -278,19 +288,19 @@ function AccordionItems({ words, wordDokenList }: AccordionItemsProps) {
           </div>
         </AccordionContent>
       </AccordionItem>
-      <AccordionItem value="item-3">
-        <AccordionTrigger className="text-medium text-base md:text-xl text-left justify-start">
+      <AccordionItem value="item-3" className="w-[60vw]">
+        <AccordionTrigger className="text-medium text-base md:text-xl text-left justify-start w-full">
           Show Words
         </AccordionTrigger>
-        <AccordionContent className="text-base md:text-lg">
-          <div className="pl-4">
-            <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="item-2" className="border-b">
-                <AccordionTrigger className="text-medium text-base md:text-xl text-left">
+        <AccordionContent className="text-base md:text-lg w-full">
+          <div className="pl-4 w-full">
+            <Accordion type="single" collapsible className="w-auto">
+              <AccordionItem value="item-2" className="border-b w-full">
+                <AccordionTrigger className="text-medium text-base md:text-xl text-left w-full">
                   Show Common Words
                 </AccordionTrigger>
-                <AccordionContent className="text-base md:text-lg">
-                  <div className="text-center flex flex-row flex-wrap space-x-2 md:space-x-4">
+                <AccordionContent className="text-base md:text-lg w-full">
+                  <div className="text-center flex flex-row flex-wrap space-x-2 md:space-x-4 w-full">
                     {words.commonWord.map((item, index) => (
                       <div key={index} className="p-1 border-2 rounded-lg mt-2">
                         {item}
@@ -299,12 +309,12 @@ function AccordionItems({ words, wordDokenList }: AccordionItemsProps) {
                   </div>
                 </AccordionContent>
               </AccordionItem>
-              <AccordionItem value="item-1" className="border-b">
-                <AccordionTrigger className="text-medium text-base md:text-xl text-left">
+              <AccordionItem value="item-1" className="border-b w-full">
+                <AccordionTrigger className="text-medium text-base md:text-xl text-left w-full">
                   Show Rare Words
                 </AccordionTrigger>
-                <AccordionContent className="text-base md:text-lg">
-                  <div className="text-center flex flex-row flex-wrap space-x-2 md:space-x-4">
+                <AccordionContent className="text-base md:text-lg w-full">
+                  <div className="text-center flex flex-row flex-wrap space-x-2 md:space-x-4 w-full">
                     {words.rareWord.map((item, index) => (
                       <div key={index} className="p-1 border-2 rounded-lg mt-2">
                         {item}

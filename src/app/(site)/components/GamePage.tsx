@@ -15,16 +15,18 @@ const GamePage = () => {
         fallback={<ComingSoon />}
       > */}
       <div className="flex flex-row justify-center items-start">
-        <div className="bg-black w-80 m-2 h-[95vh] hidden md:flex md:items-center md:justify-center">
+        <div className="bg-black w-64 m-4 h-[95vh] hidden md:flex md:items-center md:justify-center">
           <span className="text-white text-center">Google ads</span>
         </div>
         <div className={'flex flex-col '}>
-          <WordGame />
-          <div className="bg-black items-center justify-center mb-5 w-full h-48 flex md:hidden">
-            <span className="text-white text-center">Google ads</span>
-          </div>
+          <Container>
+            <WordGame />
+            <div className="bg-black items-center justify-center mb-5 w-full h-48 flex md:hidden">
+              <span className="text-white text-center">Google ads</span>
+            </div>
+          </Container>
         </div>
-        <div className="bg-black w-80 m-2 h-[95vh] hidden md:flex md:items-center md:justify-center">
+        <div className="bg-black w-60 m-4 h-[95vh] hidden md:flex md:items-center md:justify-center">
           <span className="text-white text-center">Google ads</span>
         </div>
       </div>
