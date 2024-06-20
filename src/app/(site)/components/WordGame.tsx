@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState, ReactNode } from 'react';
+import React, { useEffect, useState } from 'react';
 import TextField from '../../../core/ui/TextField';
 import Button from '../../../core/ui/Button';
 import {
@@ -9,7 +9,6 @@ import {
   AccordionTrigger,
 } from '~/core/ui/accordion';
 import { ChevronRight } from 'lucide-react';
-import { data } from './data';
 import AdBanner from 'components/AdBanner';
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
@@ -34,6 +33,7 @@ const WordGame = () => {
   const [activeChars, setActiveChars] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [wordDokenList, setWordDokenList] = useState<string[]>([]);
+  const [charColors, setCharColors] = useState<string[]>([]);
   const [message, setMessage] = useState('');
   const [words, setWords] = useState<Words>({
     rareWord: [],
@@ -46,18 +46,19 @@ const WordGame = () => {
     },
   });
 
-  const getData = async (word: string, requiredLetter?: string) => {
+  const getData = async (word: string, requiredLetter?: string[]) => {
     setLoading(true);
+    setCharColors([]);
     const client = getSupabaseBrowserClient();
-    const response = await getWordData(client, word, requiredLetter);
+    const response = await getWordData(client, word);
     if (response && response.length > 0) {
-      setMessage('Word found! 😊');
+      setMessage('Word(s) found! 😊');
       const wordData = response[0];
       if (wordData.wordokenlist) {
         setWordDokenList(wordData.wordokenlist);
       }
-      const rareWords: string[] = [];
-      const commonWords: string[] = [];
+      let rareWords: string[] = [];
+      let commonWords: string[] = [];
       if (wordData.worddict) {
         Object.keys(wordData.worddict).forEach((key: string) => {
           if (wordData.worddict[key] > 0.0) {
@@ -67,6 +68,16 @@ const WordGame = () => {
           }
         });
 
+        // Filter rareWords and commonWords based on requiredLetter
+        if (requiredLetter && requiredLetter.length > 0) {
+          rareWords = rareWords.filter((word) =>
+            requiredLetter.every((char: string) => word.includes(char)),
+          );
+          commonWords = commonWords.filter((word) =>
+            requiredLetter.every((char: string) => word.includes(char)),
+          );
+        }
+
         setWords({
           rareWord: rareWords,
           commonWord: commonWords,
@@ -74,7 +85,7 @@ const WordGame = () => {
         });
       }
     } else {
-      setMessage('There is no matching word. 😟');
+      setMessage('There is no matching word(s). 😟');
       setWords({
         rareWord: [],
         commonWord: [],
@@ -84,6 +95,65 @@ const WordGame = () => {
     }
 
     setLoading(false);
+  };
+
+  // useEffect(() => {
+  //   if (activeChars.length > 0) {
+  //     setWordDokenList((prevList) =>
+  //       prevList.filter((item) =>
+  //         activeChars.some((char) =>
+  //           item.toLowerCase().includes(char.toLowerCase()),
+  //         ),
+  //       ),
+  //     );
+
+  //     setWords((prevWords) => ({
+  //       rareWord: prevWords.rareWord.filter((word) =>
+  //         activeChars.some((char) =>
+  //           word.toLowerCase().includes(char.toLowerCase()),
+  //         ),
+  //       ),
+  //       commonWord: prevWords.commonWord.filter((word) =>
+  //         activeChars.some((char) =>
+  //           word.toLowerCase().includes(char.toLowerCase()),
+  //         ),
+  //       ),
+  //       length: undefined,
+  //     }));
+  //   }
+  // }, [activeChars]);
+
+  const handleCharClick = (char: string) => {
+    const isMaxLength = text.length === 8;
+    const maxChars = isMaxLength ? 2 : 1;
+    let updatedActiveChars = [];
+
+    if (activeChars.includes(char)) {
+      // Remove char if it's already in activeChars
+      updatedActiveChars = activeChars.filter((c) => c !== char);
+    } else if (activeChars.length < maxChars) {
+      // Add char if we haven't reached maxChars limit
+      updatedActiveChars = [...activeChars, char];
+    } else {
+      // Handle the case where maxChars is reached and text.length is not 8
+      if (!isMaxLength) {
+        updatedActiveChars = [char];
+      } else {
+        // If text length is 8 and maxChars is reached, do nothing
+        return;
+      }
+    }
+
+    setActiveChars(updatedActiveChars);
+
+    // Consolidate getData calls
+    if (
+      (isMaxLength && updatedActiveChars.length === 2) ||
+      (!isMaxLength && updatedActiveChars.length === 1)
+    ) {
+      getData(text.trim().toLowerCase(), updatedActiveChars);
+      setCharColors(updatedActiveChars)
+    }
   };
 
   const errors = formState.errors;
@@ -110,11 +180,11 @@ const WordGame = () => {
 
     if (word.length === 8 && capitalLetters.length === 2) {
       const sortedLetters = capitalLetters.sort().join('').toLowerCase();
-      getData(lowerCaseWord, sortedLetters);
+      getData(lowerCaseWord, sortedLetters.split(''));
       setActiveChars(capitalLetters.map((letter) => letter.toLowerCase()));
     } else if (capitalLetters.length === 1) {
       const letter = capitalLetters[0].toLowerCase();
-      getData(lowerCaseWord, letter);
+      getData(lowerCaseWord, [letter]);
       setActiveChars([letter]);
     } else {
       setActiveChars([]);
@@ -124,6 +194,7 @@ const WordGame = () => {
         length: undefined,
       });
       setWordDokenList([]);
+      getData(lowerCaseWord);
     }
 
     setText(word);
@@ -146,41 +217,6 @@ const WordGame = () => {
     }
   };
 
-
-
-  const handleCharClick = async (char: string) => {
-    const maxChars = text.length === 8 ? 2 : 1;
-    let updatedActiveChars;
-  
-    if (activeChars.includes(char)) {
-      updatedActiveChars = activeChars.filter((c) => c !== char);
-    } else if (activeChars.length < maxChars) {
-      updatedActiveChars = [...activeChars, char];
-    } else {
-      // Do nothing if maxChars is reached and the user tries to select another character when text length is 8
-      if (text.length === 8) {
-        return;
-      } else {
-        updatedActiveChars = [char]; // Allow selection replacement when text length is less than 8
-      }
-    }
-  
-    setActiveChars(updatedActiveChars);
-  
-    if (
-      (text.length < 8 && updatedActiveChars.length <= 1) ||
-      (text.length === 8 && updatedActiveChars.length === 2)
-    ) {
-      const sortedActiveChars = updatedActiveChars
-        .sort()
-        .join('')
-        .toLowerCase();
-      await getData(text.trim().toLowerCase(), sortedActiveChars);
-    } else if (text.length < 8 && updatedActiveChars.length === 0) {
-      await getData(text.trim().toLowerCase());
-    }
-  };
-  
   const uniqueChars = Array.from(new Set(text.toLowerCase().split('')));
   return (
     <div className="p-2 md:p-0 mt-10 flex flex-col align-center justify-center">
@@ -226,9 +262,9 @@ const WordGame = () => {
             />
           </TextField>
           <If condition={loading}>
-            <LoadingOverlay >
+            <LoadingOverlay>
               <span>Loading. Please Wait..........</span>
-              </LoadingOverlay>
+            </LoadingOverlay>
           </If>
           <Button
             variant="default"
@@ -296,19 +332,23 @@ const WordGame = () => {
         </div>
       )}
       <div className="flex flex-row align-center justify-center mt-5">
-      {message && (
-  <p
-    className={`text-center text-lg mb-10 ${
-      wordDokenList.length ? 'text-green-500' : 'text-red-500'
-    }`}
-  >
-    {message}
-  </p>
-)}
+        {message && (
+          <p
+            className={`text-center text-lg mb-10 ${
+              wordDokenList.length ? 'text-green-500' : 'text-red-500'
+            }`}
+          >
+            {message}
+          </p>
+        )}
       </div>
       <Container>
         <Accordion type="single" collapsible className="w-full mt-10">
-          <AccordionItems words={words} wordDokenList={wordDokenList} />
+          <AccordionItems
+            words={words}
+            wordDokenList={wordDokenList}
+            activeChars={charColors}
+          />
         </Accordion>
       </Container>
 
@@ -337,7 +377,7 @@ const WordGame = () => {
 export default WordGame;
 
 interface HeroTitleProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 function HeroTitle({ children }: HeroTitleProps) {
@@ -351,9 +391,14 @@ function HeroTitle({ children }: HeroTitleProps) {
 interface AccordionItemsProps {
   words: Words;
   wordDokenList: string[];
+  activeChars: string[];
 }
 
-function AccordionItems({ words, wordDokenList }: AccordionItemsProps) {
+function AccordionItems({
+  words,
+  wordDokenList,
+  activeChars,
+}: AccordionItemsProps) {
   return (
     <>
       <AccordionItem value="item-1" className="border-b w-full">
@@ -374,7 +419,18 @@ function AccordionItems({ words, wordDokenList }: AccordionItemsProps) {
               <div className="text-center flex flex-row flex-wrap space-x-2 md:space-x-4 w-full">
                 {wordDokenList.map((item, index) => (
                   <div key={index} className="p-1 border-2 rounded-lg mt-2">
-                    {item}
+                    {item.split('').map((char, idx) => (
+                      <span
+                        key={idx}
+                        className={
+                          activeChars.includes(char)
+                            ? 'text-primary-500 underline'
+                            : ''
+                        }
+                      >
+                        {char}
+                      </span>
+                    ))}
                   </div>
                 ))}
               </div>
@@ -405,7 +461,18 @@ function AccordionItems({ words, wordDokenList }: AccordionItemsProps) {
                               key={index}
                               className="p-1 border-2 rounded-lg mt-2"
                             >
-                              {item}
+                              {item.split('').map((char, idx) => (
+                                <span
+                                  key={idx}
+                                  className={
+                                    activeChars.includes(char)
+                                      ? 'text-primary-500 underline '
+                                      : ''
+                                  }
+                                >
+                                  {char}
+                                </span>
+                              ))}
                             </div>
                           ))}
                         </div>
@@ -429,7 +496,18 @@ function AccordionItems({ words, wordDokenList }: AccordionItemsProps) {
                           key={index}
                           className="p-1 border-2 rounded-lg mt-2"
                         >
-                          {item}
+                          {item.split('').map((char, idx) => (
+                            <span
+                              key={idx}
+                              className={
+                                activeChars.includes(char)
+                                  ? 'text-primary-500 underline'
+                                  : ''
+                              }
+                            >
+                              {char}
+                            </span>
+                          ))}
                         </div>
                       ))}
                     </div>
