@@ -16,40 +16,71 @@ import Link from 'next/link';
 import Label from '~/core/ui/Label';
 import { Tooltip, TooltipTrigger, TooltipContent } from '~/core/ui/Tooltip';
 import Container from '~/core/ui/Container';
+import { getWordData } from '~/lib/word/database/queries';
+import getSupabaseBrowserClient from '~/core/supabase/browser-client';
 
 type WordList = string[];
 
 interface Words {
+  length: any;
   rareWord: WordList;
   commonWord: WordList;
 }
 
 const WordGame = () => {
-  const [wordDokenList, setWordDokenList] = useState<string[]>(
-    data[0].abcdefil.wordokenList,
-  );
   const [text, setText] = useState('');
   const [activeChars, setActiveChars] = useState<string[]>([]);
-  const [words, setWords] = useState<Words>({ rareWord: [], commonWord: [] });
+  const [loading, setLoading] = useState(false);
+  const [wordDokenList, setWordDokenList] = useState<string[]>([]);
+  const [message, setMessage] = useState('');
+  const [words, setWords] = useState<Words>({
+    rareWord: [], commonWord: [],
+    length: undefined
+  });
   const { register, handleSubmit, formState } = useForm({
     defaultValues: {
       word: '',
     },
   });
 
-  useEffect(() => {
-    const rareWords: string[] = [];
-    const commonWords: string[] = [];
-
-    Object.keys(data[0].abcdefil.wordDict).forEach((word: string) => {
-      if ((data[0].abcdefil.wordDict as any)[word] > 0.0) {
-        rareWords.push(word);
-      } else {
-        commonWords.push(word);
+  const getData = async (word: string, requiredLetter?: string) => {
+    setLoading(true);
+    const client = getSupabaseBrowserClient();
+    const response = await getWordData(client, word, requiredLetter);
+    if (response && response.length > 0) {
+      setMessage('');
+      const wordData = response[0];
+      if (wordData.wordokenlist) {
+        setWordDokenList(wordData.wordokenlist);
       }
-    });
-    setWords({ rareWord: rareWords, commonWord: commonWords });
-  }, []);
+      const rareWords: string[] = [];
+      const commonWords: string[] = [];
+      if (wordData.worddict) {
+        Object.keys(wordData.worddict).forEach((key: string) => {
+          if (wordData.worddict[key] > 0.0) {
+            rareWords.push(key);
+          } else {
+            commonWords.push(key);
+          }
+        });
+
+        setWords({
+          rareWord: rareWords, commonWord: commonWords,
+          length: undefined
+        });
+      }
+    } else {
+      setMessage('There is no matching word.');
+      setWords({
+        rareWord: [], commonWord: [],
+        length: undefined
+      });
+    }
+
+    setLoading(false);
+  };
+
+ 
 
   const errors = formState.errors;
   const wordControl = register('word', {
@@ -68,17 +99,27 @@ const WordGame = () => {
     return inputWord.match(/[A-Z]/g) || [];
   };
 
-  const onSubmit = (data: { word: string }) => {
-    const { word } = data;
+  const onSubmit = ({ word }: { word: string }) => {
     const capitalLetters = findCapitalLetters(word);
+    const lowerCaseWord = word.trim().toLowerCase();
 
     if (word.length === 8 && capitalLetters.length === 2) {
+      const sortedLetters = capitalLetters.sort().join('').toLowerCase();
+      getData(lowerCaseWord, sortedLetters);
       setActiveChars(capitalLetters.map((letter) => letter.toLowerCase()));
     } else if (capitalLetters.length === 1) {
-      setActiveChars([capitalLetters[0].toLowerCase()]);
+      const letter = capitalLetters[0].toLowerCase();
+      getData(lowerCaseWord, letter);
+      setActiveChars([letter]);
     } else {
       setActiveChars([]);
+      setWords({
+        rareWord: [], commonWord: [],
+        length: undefined
+      });
+      setWordDokenList([]);
     }
+
     setText(word);
   };
 
@@ -99,17 +140,47 @@ const WordGame = () => {
     }
   };
 
-  const handleCharClick = (char: string) => {
+  // const handleCharClick = async (char: string) => {
+  //   const maxChars = text.length === 8 ? 2 : 1;
+  //   let updatedActiveChars;
+
+  //   if (activeChars.includes(char)) {
+  //     updatedActiveChars = activeChars.filter((c) => c !== char);
+  //   } else if (activeChars.length < maxChars) {
+  //     updatedActiveChars = [...activeChars, char];
+  //   } else {
+  //     // No changes to activeChars, return early
+  //     return;
+  //   }
+
+  //   setActiveChars(updatedActiveChars);
+
+  //   // Assuming getData is your API call function
+  //   const sortedActiveChars = updatedActiveChars.sort().join('').toLowerCase();
+  //   await getData(text.trim().toLowerCase(), sortedActiveChars);
+  // };
+  const handleCharClick = async (char: string) => {
     const maxChars = text.length === 8 ? 2 : 1;
+    let updatedActiveChars;
+  
     if (activeChars.includes(char)) {
-      setActiveChars(activeChars.filter((c) => c !== char));
+      updatedActiveChars = activeChars.filter((c) => c !== char);
     } else if (activeChars.length < maxChars) {
-      setActiveChars([...activeChars, char]);
+      updatedActiveChars = [...activeChars, char];
+    } else {
+      
+      return;
+    }
+  
+    setActiveChars(updatedActiveChars);
+    if ((text.length < 8 && updatedActiveChars.length === 1) || (text.length === 8 && updatedActiveChars.length === 2)) {
+      const sortedActiveChars = updatedActiveChars.sort().join('').toLowerCase();
+      await getData(text.trim().toLowerCase(), sortedActiveChars);
     }
   };
+  
 
   const uniqueChars = Array.from(new Set(text.toLowerCase().split('')));
-
   return (
     <div className="p-2 md:p-0 mt-10 flex flex-col align-center justify-center">
       <div className={'flex w-full flex-1 flex-col items-center space-y-2'}>
@@ -164,7 +235,10 @@ const WordGame = () => {
           </Button>
         </div>
         <div className="text-left mt-3">
-          <TextField.Error error={errors.word?.message} className="-mt-1 ml-2" />
+          <TextField.Error
+            error={errors.word?.message}
+            className="-mt-1 ml-2"
+          />
           <TextField.Hint className="mt-3 ml-3">
             <ul className="list-disc pl-5">
               <li>
@@ -216,6 +290,13 @@ const WordGame = () => {
           </div>
         </div>
       )}
+      <div className="flex flex-row align-center justify-center mt-5">
+        {message && (
+          <p className="text-center text-lg font-bold text-red-500 mb-10">
+            {message}
+          </p>
+        )}
+      </div>
       <Container>
         <Accordion type="single" collapsible className="w-full mt-10">
           <AccordionItems words={words} wordDokenList={wordDokenList} />
@@ -264,6 +345,7 @@ interface AccordionItemsProps {
 }
 
 function AccordionItems({ words, wordDokenList }: AccordionItemsProps) {
+ 
   return (
     <>
       <AccordionItem value="item-1" className="border-b w-full">
@@ -279,12 +361,18 @@ function AccordionItems({ words, wordDokenList }: AccordionItemsProps) {
           Show Wordoken
         </AccordionTrigger>
         <AccordionContent className="text-base md:text-lg w-full">
-          <div className="text-center flex flex-row flex-wrap space-x-2 md:space-x-4 w-full">
-            {wordDokenList.map((item, index) => (
-              <div key={index} className="p-1 border-2 rounded-lg mt-2">
-                {item}
+          <div>
+            {wordDokenList.length ? (
+              <div className="text-center flex flex-row flex-wrap space-x-2 md:space-x-4 w-full">
+                {wordDokenList.map((item, index) => (
+                  <div key={index} className="p-1 border-2 rounded-lg mt-2">
+                    {item}
+                  </div>
+                ))}
               </div>
-            ))}
+            ) : (
+              <div className="">There is no matching word</div>
+            )}
           </div>
         </AccordionContent>
       </AccordionItem>
@@ -300,12 +388,23 @@ function AccordionItems({ words, wordDokenList }: AccordionItemsProps) {
                   Show Common Words
                 </AccordionTrigger>
                 <AccordionContent className="text-base md:text-lg w-full">
-                  <div className="text-center flex flex-row flex-wrap space-x-2 md:space-x-4 w-full">
-                    {words.commonWord.map((item, index) => (
-                      <div key={index} className="p-1 border-2 rounded-lg mt-2">
-                        {item}
-                      </div>
-                    ))}
+                  <div>
+                    <div>
+                      {words.commonWord.length ? (
+                        <div className="text-center flex flex-row flex-wrap space-x-2 md:space-x-4 w-full">
+                          {words.commonWord.map((item, index) => (
+                            <div
+                              key={index}
+                              className="p-1 border-2 rounded-lg mt-2"
+                            >
+                              {item}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="">There is no matching word</div>
+                      )}
+                    </div>
                   </div>
                 </AccordionContent>
               </AccordionItem>
@@ -314,13 +413,21 @@ function AccordionItems({ words, wordDokenList }: AccordionItemsProps) {
                   Show Rare Words
                 </AccordionTrigger>
                 <AccordionContent className="text-base md:text-lg w-full">
-                  <div className="text-center flex flex-row flex-wrap space-x-2 md:space-x-4 w-full">
-                    {words.rareWord.map((item, index) => (
-                      <div key={index} className="p-1 border-2 rounded-lg mt-2">
-                        {item}
-                      </div>
-                    ))}
-                  </div>
+                  {words.rareWord.length ? (
+                    <div className="text-center flex flex-row flex-wrap space-x-2 md:space-x-4 w-full">
+                      {' '}
+                      {words.rareWord.map((item, index) => (
+                        <div
+                          key={index}
+                          className="p-1 border-2 rounded-lg mt-2"
+                        >
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="">There is no matching word</div>
+                  )}
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
