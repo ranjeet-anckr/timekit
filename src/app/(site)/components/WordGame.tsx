@@ -18,6 +18,8 @@ import { Tooltip, TooltipTrigger, TooltipContent } from '~/core/ui/Tooltip';
 import Container from '~/core/ui/Container';
 import { getWordData } from '~/lib/word/database/queries';
 import getSupabaseBrowserClient from '~/core/supabase/browser-client';
+import If from '~/core/ui/If';
+import LoadingOverlay from '~/core/ui/LoadingOverlay';
 
 type WordList = string[];
 
@@ -34,8 +36,9 @@ const WordGame = () => {
   const [wordDokenList, setWordDokenList] = useState<string[]>([]);
   const [message, setMessage] = useState('');
   const [words, setWords] = useState<Words>({
-    rareWord: [], commonWord: [],
-    length: undefined
+    rareWord: [],
+    commonWord: [],
+    length: undefined,
   });
   const { register, handleSubmit, formState } = useForm({
     defaultValues: {
@@ -48,7 +51,7 @@ const WordGame = () => {
     const client = getSupabaseBrowserClient();
     const response = await getWordData(client, word, requiredLetter);
     if (response && response.length > 0) {
-      setMessage('');
+      setMessage('Word found! 😊');
       const wordData = response[0];
       if (wordData.wordokenlist) {
         setWordDokenList(wordData.wordokenlist);
@@ -65,22 +68,23 @@ const WordGame = () => {
         });
 
         setWords({
-          rareWord: rareWords, commonWord: commonWords,
-          length: undefined
+          rareWord: rareWords,
+          commonWord: commonWords,
+          length: undefined,
         });
       }
     } else {
-      setMessage('There is no matching word.');
+      setMessage('There is no matching word. 😟');
       setWords({
-        rareWord: [], commonWord: [],
-        length: undefined
+        rareWord: [],
+        commonWord: [],
+        length: undefined,
       });
+      setWordDokenList([]);
     }
 
     setLoading(false);
   };
-
- 
 
   const errors = formState.errors;
   const wordControl = register('word', {
@@ -100,6 +104,7 @@ const WordGame = () => {
   };
 
   const onSubmit = ({ word }: { word: string }) => {
+    setMessage('');
     const capitalLetters = findCapitalLetters(word);
     const lowerCaseWord = word.trim().toLowerCase();
 
@@ -114,8 +119,9 @@ const WordGame = () => {
     } else {
       setActiveChars([]);
       setWords({
-        rareWord: [], commonWord: [],
-        length: undefined
+        rareWord: [],
+        commonWord: [],
+        length: undefined,
       });
       setWordDokenList([]);
     }
@@ -140,25 +146,8 @@ const WordGame = () => {
     }
   };
 
-  // const handleCharClick = async (char: string) => {
-  //   const maxChars = text.length === 8 ? 2 : 1;
-  //   let updatedActiveChars;
 
-  //   if (activeChars.includes(char)) {
-  //     updatedActiveChars = activeChars.filter((c) => c !== char);
-  //   } else if (activeChars.length < maxChars) {
-  //     updatedActiveChars = [...activeChars, char];
-  //   } else {
-  //     // No changes to activeChars, return early
-  //     return;
-  //   }
 
-  //   setActiveChars(updatedActiveChars);
-
-  //   // Assuming getData is your API call function
-  //   const sortedActiveChars = updatedActiveChars.sort().join('').toLowerCase();
-  //   await getData(text.trim().toLowerCase(), sortedActiveChars);
-  // };
   const handleCharClick = async (char: string) => {
     const maxChars = text.length === 8 ? 2 : 1;
     let updatedActiveChars;
@@ -168,18 +157,30 @@ const WordGame = () => {
     } else if (activeChars.length < maxChars) {
       updatedActiveChars = [...activeChars, char];
     } else {
-      
-      return;
+      // Do nothing if maxChars is reached and the user tries to select another character when text length is 8
+      if (text.length === 8) {
+        return;
+      } else {
+        updatedActiveChars = [char]; // Allow selection replacement when text length is less than 8
+      }
     }
   
     setActiveChars(updatedActiveChars);
-    if ((text.length < 8 && updatedActiveChars.length === 1) || (text.length === 8 && updatedActiveChars.length === 2)) {
-      const sortedActiveChars = updatedActiveChars.sort().join('').toLowerCase();
+  
+    if (
+      (text.length < 8 && updatedActiveChars.length <= 1) ||
+      (text.length === 8 && updatedActiveChars.length === 2)
+    ) {
+      const sortedActiveChars = updatedActiveChars
+        .sort()
+        .join('')
+        .toLowerCase();
       await getData(text.trim().toLowerCase(), sortedActiveChars);
+    } else if (text.length < 8 && updatedActiveChars.length === 0) {
+      await getData(text.trim().toLowerCase());
     }
   };
   
-
   const uniqueChars = Array.from(new Set(text.toLowerCase().split('')));
   return (
     <div className="p-2 md:p-0 mt-10 flex flex-col align-center justify-center">
@@ -224,7 +225,11 @@ const WordGame = () => {
               {...wordControl}
             />
           </TextField>
-
+          <If condition={loading}>
+            <LoadingOverlay >
+              <span>Loading. Please Wait..........</span>
+              </LoadingOverlay>
+          </If>
           <Button
             variant="default"
             type="submit"
@@ -291,11 +296,15 @@ const WordGame = () => {
         </div>
       )}
       <div className="flex flex-row align-center justify-center mt-5">
-        {message && (
-          <p className="text-center text-lg font-bold text-red-500 mb-10">
-            {message}
-          </p>
-        )}
+      {message && (
+  <p
+    className={`text-center text-lg mb-10 ${
+      wordDokenList.length ? 'text-green-500' : 'text-red-500'
+    }`}
+  >
+    {message}
+  </p>
+)}
       </div>
       <Container>
         <Accordion type="single" collapsible className="w-full mt-10">
@@ -345,7 +354,6 @@ interface AccordionItemsProps {
 }
 
 function AccordionItems({ words, wordDokenList }: AccordionItemsProps) {
- 
   return (
     <>
       <AccordionItem value="item-1" className="border-b w-full">
