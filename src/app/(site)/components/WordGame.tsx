@@ -53,10 +53,12 @@ const WordGame = () => {
     const response = await getWordData(client, word);
     if (response && response.length > 0) {
       setMessage('Word(s) found! 😊');
+      setCharColors(requiredLetter || []);
       const wordData = response[0];
       if (wordData.wordokenlist) {
         setWordDokenList(wordData.wordokenlist);
       }
+
       let rareWords: string[] = [];
       let commonWords: string[] = [];
       if (wordData.worddict) {
@@ -152,7 +154,7 @@ const WordGame = () => {
       (!isMaxLength && updatedActiveChars.length === 1)
     ) {
       getData(text.trim().toLowerCase(), updatedActiveChars);
-      setCharColors(updatedActiveChars)
+      setCharColors(updatedActiveChars);
     }
   };
 
@@ -435,7 +437,7 @@ function AccordionItems({
                 ))}
               </div>
             ) : (
-              <div className="">There is no matching word</div>
+              <div className="italic">There is no matching word(s).</div>
             )}
           </div>
         </AccordionContent>
@@ -477,7 +479,7 @@ function AccordionItems({
                           ))}
                         </div>
                       ) : (
-                        <div className="">There is no matching word</div>
+                        <div className="italic">There is no matching word(s).</div>
                       )}
                     </div>
                   </div>
@@ -512,7 +514,7 @@ function AccordionItems({
                       ))}
                     </div>
                   ) : (
-                    <div className="">There is no matching word</div>
+                    <div className="italic">There is no matching word(s).</div>
                   )}
                 </AccordionContent>
               </AccordionItem>
