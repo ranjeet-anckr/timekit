@@ -17,13 +17,18 @@ export default function RootLayout({
   return (
     <html lang={configuration.site.locale} className="">
       <head>
-        {configuration.environment === 'production' && (
+        {/* {configuration.environment === 'production' && (
           <script
             async
             src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6617299272110261"
             crossOrigin="anonymous"
           ></script>
-        )}
+        )} */}
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3757928413611920"
+          crossOrigin="anonymous"
+        ></script>
       </head>
       <Fonts />
       <ThemeSetter />

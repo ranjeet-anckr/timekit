@@ -248,15 +248,15 @@ const WordGame = () => {
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="mt-10 flex flex-col items-center"
+        className="mt-10 flex flex-col items-center justify-center"
         noValidate
       >
-        <div className="flex flex-row space-x-3 md:space-x-8 items-center justify-center">
+        <div className="flex flex-row space-x-8 items-start">
           <TextField>
             <TextField.Input
               required
               type="text"
-              className="font-bold text-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring"
+              className="font-bold text-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring w-full"
               placeholder="Enter Puzzle Letters"
               onKeyDown={handleOnKeyDown}
               maxLength={8}
@@ -277,13 +277,13 @@ const WordGame = () => {
             Submit
           </Button>
         </div>
-        <div className="text-left mt-3">
+        <div className=" flex flex-col text-left mt-3 justify-center ">
           <TextField.Error
             error={errors.word?.message}
             className="-mt-1 ml-2"
           />
-          <TextField.Hint className="mt-3 ml-3">
-            <ul className="list-disc pl-5">
+          <TextField.Hint className="mt-1 ml-3">
+            <ul className="list-disc ml-6">
               <li>
                 Text should be a minimum of 6 letters and a maximum of 8
                 letters.
@@ -291,7 +291,7 @@ const WordGame = () => {
             </ul>
           </TextField.Hint>
           <TextField.Hint className="mt-1 ml-3">
-            <ul className="list-disc pl-5">
+            <ul className="list-disc ml-6">
               <li>Capitalize required letter(s) for better results.</li>
             </ul>
           </TextField.Hint>
@@ -479,7 +479,9 @@ function AccordionItems({
                           ))}
                         </div>
                       ) : (
-                        <div className="italic">There is no matching word(s).</div>
+                        <div className="italic">
+                          There is no matching word(s).
+                        </div>
                       )}
                     </div>
                   </div>
