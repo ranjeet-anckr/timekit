@@ -222,6 +222,11 @@ const WordGame = () => {
   const uniqueChars = Array.from(new Set(text.toLowerCase().split('')));
   return (
     <div className="p-2 md:p-0 mt-10 flex flex-col align-center justify-center">
+      <If condition={loading}>
+        <LoadingOverlay>
+          <span>Loading. Please Wait..........</span>
+        </LoadingOverlay>
+      </If>
       <div className={'flex w-full flex-1 flex-col items-center space-y-2'}>
         <HeroTitle>
           <div className="flex flex-col">
@@ -263,11 +268,7 @@ const WordGame = () => {
               {...wordControl}
             />
           </TextField>
-          <If condition={loading}>
-            <LoadingOverlay>
-              <span>Loading. Please Wait..........</span>
-            </LoadingOverlay>
-          </If>
+
           <Button
             variant="default"
             type="submit"
